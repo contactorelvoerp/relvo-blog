@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path . -Directory)",
+      "Bash(Select-Object Name)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\ricar\\Desktop\\RELVO\\relvo-landing\\src\\i18n"
+    ]
+  }
+}

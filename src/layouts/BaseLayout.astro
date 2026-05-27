@@ -1,0 +1,142 @@
+---
+import '../styles/global.css'
+
+interface Props {
+  title: string
+  description?: string
+  image?: string
+}
+
+const {
+  title,
+  description = 'Blog de Relvo — Revenue ops, facturación y operaciones comerciales B2B.',
+  image,
+} = Astro.props
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://blog.relvoerp.com')
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonicalURL} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {image && <meta property="og:image" content={image} />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet" />
+  </head>
+
+  <body>
+
+    <!-- Navbar — minimal, solo home del blog -->
+    <header
+      style="
+        position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+        background: rgba(255,255,255,0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-subtle);
+      "
+    >
+      <div
+        style="
+          max-width: 82rem; margin: 0 auto;
+          padding: 0 1.5rem;
+          height: 56px;
+          display: flex; align-items: center; justify-content: space-between;
+        "
+      >
+        <!-- Logo → home del blog -->
+        <a href="/" style="display: flex; align-items: center; gap: 8px;">
+          <img src="/logo-mark-dark.svg" alt="Relvo" style="height: 18px; width: auto;" />
+          <span
+            style="
+              font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600;
+              color: var(--text-main); letter-spacing: -0.02em;
+            "
+          >
+            relvo
+          </span>
+          <span
+            style="
+              font-family: var(--font-mono); font-size: 0.58rem; font-weight: 500;
+              letter-spacing: 0.1em; text-transform: uppercase;
+              background: rgba(19,19,30,0.07); color: var(--text-soft);
+              padding: 2px 7px; border-radius: 4px;
+            "
+          >
+            Blog
+          </span>
+        </a>
+
+        <!-- Volver al producto -->
+        <a
+          href="https://relvoerp.com"
+          style="
+            font-family: var(--font-ui); font-size: 0.8rem; font-weight: 500;
+            color: var(--text-soft); transition: color 0.15s;
+          "
+          onmouseover="this.style.color='var(--text-main)'"
+          onmouseout="this.style.color='var(--text-soft)'"
+        >
+          relvoerp.com →
+        </a>
+      </div>
+    </header>
+
+    <main style="padding-top: 56px;">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer
+      style="
+        border-top: 1px solid var(--border-subtle);
+        padding: 24px 1.5rem;
+        margin-top: 80px;
+      "
+    >
+      <div
+        style="
+          max-width: 82rem; margin: 0 auto;
+          display: flex; align-items: center; justify-content: space-between;
+        "
+      >
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <img src="/logo-mark-dark.svg" alt="Relvo" style="height: 16px; width: auto; opacity: 0.35;" />
+          <span
+            style="
+              font-family: var(--font-mono); font-size: 0.7rem;
+              color: var(--text-muted); letter-spacing: 0.06em;
+            "
+          >
+            © {new Date().getFullYear()} Relvo — Blog
+          </span>
+        </div>
+        <a
+          href="https://relvoerp.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="
+            font-family: var(--font-ui); font-size: 0.8rem;
+            color: var(--text-muted); transition: color 0.15s;
+          "
+          onmouseover="this.style.color='var(--text-soft)'"
+          onmouseout="this.style.color='var(--text-muted)'"
+        >
+          relvoerp.com
+        </a>
+      </div>
+    </footer>
+
+  </body>
+</html>

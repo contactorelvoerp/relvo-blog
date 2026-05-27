@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens — identical to relvoerp.com ── */
+:root {
+  --bg-main:       #ffffff;
+  --text-main:     #13131E;
+  --text-soft:     #626262;
+  --text-muted:    #ABABB7;
+
+  --border-subtle: rgba(19, 19, 30, 0.05);
+  --border-default:rgba(19, 19, 30, 0.08);
+  --border-strong: rgba(19, 19, 30, 0.14);
+
+  --brand-accent:  #D0FF0B;
+  --brand-warm:    #FF9566;
+  --brand-verde:   #72DDAA;
+  --brand-morado:  #633BF2;
+
+  --radius-sm:     0.75rem;
+  --radius-md:     0.95rem;
+
+  --font-display: 'Fujiwara A', 'Playfair Display', Georgia, serif;
+  --font-ui:      'Instrument Sans', system-ui, sans-serif;
+  --font-mono:    'Geist Mono', ui-monospace, monospace;
+}
+
+/* ── Local fonts ── */
+@font-face {
+  font-family: 'Fujiwara A';
+  src: url('/fonts/fujiwara/FujiwaraA-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/geist-mono/GeistMono-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/geist-mono/GeistMono-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  margin: 0;
+}
+* { box-sizing: border-box; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Article prose ── */
+.prose-relvo h2 {
+  font-family: var(--font-ui);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--text-main);
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+.prose-relvo h3 {
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose-relvo p {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--text-soft);
+  margin-bottom: 1.25rem;
+}
+.prose-relvo ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.prose-relvo ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.prose-relvo li {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--text-soft);
+  margin-bottom: 0.4rem;
+}
+.prose-relvo blockquote {
+  border-left: 2px solid var(--brand-accent);
+  padding-left: 1.25rem;
+  margin: 1.75rem 0;
+  color: var(--text-soft);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+.prose-relvo code:not(pre code) {
+  background: rgba(19, 19, 30, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--text-main);
+}
+.prose-relvo pre {
+  background: #13131E;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 1.75rem 0;
+}
+.prose-relvo pre code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.85);
+}
+.prose-relvo a {
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-strong);
+}
+.prose-relvo a:hover {
+  text-decoration-color: var(--text-soft);
+}
+.prose-relvo strong {
+  color: var(--text-main);
+  font-weight: 600;
+}
+.prose-relvo hr {
+  border: none;
+  border-top: 1px solid var(--border-default);
+  margin: 2.5rem 0;
+}
