@@ -39,77 +39,48 @@ function formatDate(d: string) {
 ---
 
 <BaseLayout
-  title={`${post.title} — Relvo Blog`}
+  title={`${post.title} | Relvo Blog`}
   description={post.excerpt}
   image={post.coverImage ?? undefined}
 >
 
+  <!-- ── COVER IMAGE (Notion style — full bleed) ── -->
+  {post.coverImage && (
+    <div class="cover-wrap">
+      <img src={post.coverImage} alt={post.title} class="cover-img" />
+    </div>
+  )}
+
   <!-- ── ARTICLE HEADER ── -->
-  <div style="border-bottom: 1px solid var(--border-subtle); padding: 48px 1.5rem 44px;">
-    <div style="max-width: 680px; margin: 0 auto;">
+  <div class={`article-header ${post.coverImage ? 'has-cover' : ''}`}>
+    <div class="header-inner">
 
       <!-- Breadcrumb -->
-      <div
-        style="
-          display: flex; align-items: center; gap: 8px; margin-bottom: 28px;
-          font-family: var(--font-ui); font-size: 0.8rem; color: var(--text-muted);
-        "
-      >
-        <a href="/"
-          style="transition: color 0.15s;"
-          onmouseover="this.style.color='var(--text-soft)'"
-          onmouseout="this.style.color='var(--text-muted)'"
-        >Blog</a>
+      <div class="breadcrumb">
+        <a href="/" class="breadcrumb-link">Blog</a>
         <span>›</span>
         <span
-          style={`
-            font-family: var(--font-mono); font-size: 0.6rem;
-            letter-spacing: 0.12em; text-transform: uppercase;
-            color: ${categoryColor(post.category)};
-            background: ${categoryBg(post.category)};
-            padding: 2px 7px; border-radius: 4px;
-          `}
+          class="cat-badge"
+          style={`color: ${categoryColor(post.category)}; background: ${categoryBg(post.category)};`}
         >
           {categoryLabel(post.category)}
         </span>
       </div>
 
       <!-- Title -->
-      <h1
-        style="
-          font-family: var(--font-display);
-          font-size: clamp(1.75rem, 4.5vw, 2.8rem);
-          font-weight: 500; letter-spacing: -0.02em; line-height: 1.1;
-          color: var(--text-main); margin-bottom: 16px;
-        "
-      >
-        {post.title}
-      </h1>
+      <h1 class="post-title">{post.title}</h1>
 
       <!-- Excerpt / deck -->
       {post.excerpt && (
-        <p
-          style="
-            font-family: var(--font-ui); font-size: 1.125rem;
-            line-height: 1.65; color: var(--text-soft); margin-bottom: 20px;
-          "
-        >
-          {post.excerpt}
-        </p>
+        <p class="post-excerpt">{post.excerpt}</p>
       )}
 
       <!-- Byline -->
-      <div
-        style="
-          display: flex; align-items: center; gap: 8px;
-          font-family: var(--font-mono); font-size: 0.65rem;
-          letter-spacing: 0.06em; color: var(--text-muted);
-        "
-      >
+      <div class="byline">
         <span>{post.author}</span>
         {post.publishedAt && (
           <>
-            <span style="color: var(--border-strong);">·</span>
+            <span class="byline-dot">·</span>
             <span>{formatDate(post.publishedAt)}</span>
           </>
         )}
@@ -117,22 +88,6 @@ function formatDate(d: string) {
 
     </div>
   </div>
-
-  <!-- ── COVER IMAGE ── -->
-  {post.coverImage && (
-    <div style="max-width: 680px; margin: 40px auto 0; padding: 0 1.5rem;">
-      <img
-        src={post.coverImage}
-        alt={post.title}
-        style="
-          width: 100%; max-height: 420px; object-fit: cover;
-          border-radius: var(--radius-md);
-          border: 1px solid var(--border-subtle);
-          display: block;
-        "
-      />
-    </div>
-  )}
 
   <!-- ── ARTICLE BODY ── -->
   <article style="max-width: 680px; margin: 0 auto; padding: 44px 1.5rem 0;">
@@ -176,3 +131,89 @@ function formatDate(d: string) {
   </nav>
 
 </BaseLayout>
+
+<style>
+  /* ── Cover image ── */
+  .cover-wrap {
+    width: 100%;
+    max-height: 520px;
+    overflow: hidden;
+    display: block;
+  }
+  .cover-img {
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ── Article header ── */
+  .article-header {
+    padding: 48px 1.5rem 44px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .article-header.has-cover {
+    padding-top: 36px;
+  }
+  .header-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .breadcrumb-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .breadcrumb-link:hover { color: var(--text-soft); }
+  .cat-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  /* Title */
+  .post-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4.5vw, 2.8rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--text-main);
+    margin: 0 0 16px;
+  }
+
+  /* Excerpt */
+  .post-excerpt {
+    font-family: var(--font-ui);
+    font-size: 1.125rem;
+    line-height: 1.65;
+    color: var(--text-soft);
+    margin: 0 0 20px;
+  }
+
+  /* Byline */
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .byline-dot { color: var(--border-strong); }
+</style>
