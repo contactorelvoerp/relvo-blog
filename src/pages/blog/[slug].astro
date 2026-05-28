@@ -1,8 +1,8 @@
 ---
 export const prerender = true
 import { createReader } from '@keystatic/core/reader'
-import { DocumentRenderer } from '@keystatic/core/renderer'
 import keystaticConfig from '../../../keystatic.config'
+import ArticleRenderer from '../../components/ArticleRenderer'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { categoryColor, categoryBg, categoryLabel } from '../../lib/categories'
 
@@ -32,10 +32,45 @@ if (!post) return Astro.redirect('/404')
 const content = await post.content()
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('es-MX', {
+  return new Date(d).toLocaleDateString('es-CL', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
 }
+
+// Reading time
+function countWords(nodes: any[]): number {
+  let n = 0
+  for (const node of nodes) {
+    if (typeof node.text === 'string') n += node.text.split(/\s+/).filter(Boolean).length
+    if (node.children) n += countWords(node.children)
+  }
+  return n
+}
+const readingTime = Math.max(1, Math.round(countWords(content) / 200))
+
+// Extract headings for TOC
+function slugify(text: string) {
+  return text.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+function getNodeText(node: any): string {
+  if (typeof node.text === 'string') return node.text
+  if (node.children) return node.children.map(getNodeText).join('')
+  return ''
+}
+interface Heading { level: number; text: string; id: string }
+function extractHeadings(nodes: any[]): Heading[] {
+  const out: Heading[] = []
+  for (const node of nodes) {
+    if (node.type === 'heading' && (node.level === 2 || node.level === 3)) {
+      const text = getNodeText(node)
+      out.push({ level: node.level, text, id: slugify(text) })
+    }
+  }
+  return out
+}
+const headings = extractHeadings(content)
 ---
 
 <BaseLayout
@@ -44,7 +79,7 @@ function formatDate(d: string) {
   image={post.coverImage ?? undefined}
 >
 
-  <!-- ── COVER IMAGE (Notion style — full bleed) ── -->
+  <!-- ── COVER IMAGE ── -->
   {post.coverImage && (
     <div class="cover-wrap">
       <img src={post.coverImage} alt={post.title} class="cover-img" />
@@ -54,8 +89,6 @@ function formatDate(d: string) {
   <!-- ── ARTICLE HEADER ── -->
   <div class={`article-header ${post.coverImage ? 'has-cover' : ''}`}>
     <div class="header-inner">
-
-      <!-- Breadcrumb -->
       <div class="breadcrumb">
         <a href="/" class="breadcrumb-link">Blog</a>
         <span>›</span>
@@ -66,16 +99,8 @@ function formatDate(d: string) {
           {categoryLabel(post.category)}
         </span>
       </div>
-
-      <!-- Title -->
       <h1 class="post-title">{post.title}</h1>
-
-      <!-- Excerpt / deck -->
-      {post.excerpt && (
-        <p class="post-excerpt">{post.excerpt}</p>
-      )}
-
-      <!-- Byline -->
+      {post.excerpt && <p class="post-excerpt">{post.excerpt}</p>}
       <div class="byline">
         <span>{post.author}</span>
         {post.publishedAt && (
@@ -84,53 +109,101 @@ function formatDate(d: string) {
             <span>{formatDate(post.publishedAt)}</span>
           </>
         )}
+        <span class="byline-dot">·</span>
+        <span>{readingTime} min de lectura</span>
       </div>
-
     </div>
   </div>
 
-  <!-- ── ARTICLE BODY ── -->
-  <article style="max-width: 680px; margin: 0 auto; padding: 44px 1.5rem 0;">
-    <div class="prose-relvo">
-      <DocumentRenderer document={content} />
-    </div>
-  </article>
+  <!-- ── BODY + TOC ── -->
+  <div class="body-wrap">
+
+    <!-- Article -->
+    <article class="prose-wrap" id="article-body">
+      <div class="prose-relvo">
+        <ArticleRenderer document={content} />
+      </div>
+    </article>
+
+    <!-- TOC Sidebar -->
+    {headings.length > 0 && (
+      <aside class="toc-sidebar" id="toc-sidebar">
+        <p class="toc-label">En este artículo</p>
+        <nav class="toc-nav">
+          {headings.map(h => (
+            <a
+              href={`#${h.id}`}
+              class={`toc-link toc-h${h.level}`}
+              data-id={h.id}
+            >
+              {h.text}
+            </a>
+          ))}
+        </nav>
+      </aside>
+    )}
+  </div>
 
   <!-- ── POST NAVIGATION ── -->
-  <nav style="max-width: 680px; margin: 56px auto 0; padding: 24px 1.5rem; border-top: 1px solid var(--border-default);">
-    <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
-
+  <nav class="post-nav">
+    <div class="post-nav-inner">
       {prev ? (
-        <a href={`/blog/${prev.slug}`} style="flex: 1; transition: color 0.15s;"
-          onmouseover="this.querySelector('span:last-child').style.color='var(--text-main)'"
-          onmouseout="this.querySelector('span:last-child').style.color='var(--text-soft)'"
-        >
-          <span style="display: block; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">← Anterior</span>
-          <span style="display: block; font-family: var(--font-ui); font-size: 0.875rem; font-weight: 500; color: var(--text-soft); line-height: 1.3; transition: color 0.15s;">{prev.title}</span>
+        <a href={`/blog/${prev.slug}`} class="nav-link nav-prev">
+          <span class="nav-label">← Anterior</span>
+          <span class="nav-title">{prev.title}</span>
         </a>
-      ) : <div style="flex:1" />}
+      ) : <div />}
 
-      <a href="/" style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; transition: color 0.15s; flex-shrink: 0;"
-        onmouseover="this.style.color='var(--text-soft)'"
-        onmouseout="this.style.color='var(--text-muted)'"
-      >
-        ↑ Blog
-      </a>
+      <a href="/" class="nav-up">↑ Blog</a>
 
       {next ? (
-        <a href={`/blog/${next.slug}`} style="flex: 1; text-align: right; transition: color 0.15s;"
-          onmouseover="this.querySelector('span:last-child').style.color='var(--text-main)'"
-          onmouseout="this.querySelector('span:last-child').style.color='var(--text-soft)'"
-        >
-          <span style="display: block; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Siguiente →</span>
-          <span style="display: block; font-family: var(--font-ui); font-size: 0.875rem; font-weight: 500; color: var(--text-soft); line-height: 1.3; transition: color 0.15s;">{next.title}</span>
+        <a href={`/blog/${next.slug}`} class="nav-link nav-next">
+          <span class="nav-label">Siguiente →</span>
+          <span class="nav-title">{next.title}</span>
         </a>
-      ) : <div style="flex:1" />}
-
+      ) : <div />}
     </div>
   </nav>
 
 </BaseLayout>
+
+<script>
+  // Active heading tracking
+  const links = document.querySelectorAll<HTMLAnchorElement>('.toc-link')
+  if (links.length > 0) {
+    const ids = Array.from(links).map(l => l.dataset.id!)
+    const els = ids.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[]
+
+    let active = ''
+    const setActive = (id: string) => {
+      if (id === active) return
+      active = id
+      links.forEach(l => l.classList.toggle('is-active', l.dataset.id === id))
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id)
+            break
+          }
+        }
+      },
+      { rootMargin: '-72px 0px -70% 0px', threshold: 0 }
+    )
+    els.forEach(el => observer.observe(el))
+
+    // Smooth scroll on click
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault()
+        const el = document.getElementById(link.dataset.id!)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    })
+  }
+</script>
 
 <style>
   /* ── Cover image ── */
@@ -159,68 +232,133 @@ function formatDate(d: string) {
     padding: 48px 1.5rem 44px;
     border-bottom: 1px solid var(--border-subtle);
   }
-  .article-header.has-cover {
-    padding-top: 32px;
-  }
+  .article-header.has-cover { padding-top: 32px; }
   .header-inner {
     max-width: 680px;
     margin: 0 auto;
   }
-
-  /* Breadcrumb */
   .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex; align-items: center; gap: 8px;
     margin-bottom: 28px;
-    font-family: var(--font-ui);
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-family: var(--font-ui); font-size: 0.8rem; color: var(--text-muted);
   }
-  .breadcrumb-link {
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: color 0.15s;
-  }
+  .breadcrumb-link { color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
   .breadcrumb-link:hover { color: var(--text-soft); }
   .cat-badge {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 4px;
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 4px;
   }
-
-  /* Title */
   .post-title {
     font-family: var(--font-display);
     font-size: clamp(1.75rem, 4.5vw, 2.8rem);
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    color: var(--text-main);
-    margin: 0 0 16px;
+    font-weight: 500; letter-spacing: -0.02em; line-height: 1.1;
+    color: var(--text-main); margin: 0 0 16px;
   }
-
-  /* Excerpt */
   .post-excerpt {
-    font-family: var(--font-ui);
-    font-size: 1.125rem;
-    line-height: 1.65;
-    color: var(--text-soft);
-    margin: 0 0 20px;
+    font-family: var(--font-ui); font-size: 1.125rem;
+    line-height: 1.65; color: var(--text-soft); margin: 0 0 20px;
   }
-
-  /* Byline */
   .byline {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.06em; color: var(--text-muted);
   }
   .byline-dot { color: var(--border-strong); }
+
+  /* ── Body + TOC layout ── */
+  .body-wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 44px 1.5rem 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .body-wrap {
+      grid-template-columns: minmax(0, 680px) 200px;
+    }
+  }
+  .prose-wrap { min-width: 0; }
+
+  /* ── TOC Sidebar ── */
+  .toc-sidebar {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .toc-sidebar {
+      display: block;
+      position: sticky;
+      top: 80px;
+    }
+  }
+  .toc-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 12px;
+  }
+  .toc-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .toc-link {
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 4px 0 4px 8px;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    display: block;
+  }
+  .toc-h3 { padding-left: 18px; font-size: 0.73rem; }
+  .toc-link:hover { color: var(--text-soft); }
+  .toc-link.is-active {
+    color: var(--text-main);
+    border-left-color: var(--text-main);
+  }
+
+  /* ── Post navigation ── */
+  .post-nav {
+    max-width: 680px;
+    margin: 56px auto 0;
+    padding: 24px 1.5rem;
+    border-top: 1px solid var(--border-default);
+  }
+  .post-nav-inner {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 24px;
+  }
+  .nav-link {
+    flex: 1; text-decoration: none; transition: color 0.15s;
+  }
+  .nav-next { text-align: right; }
+  .nav-label {
+    display: block;
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 4px;
+  }
+  .nav-title {
+    display: block;
+    font-family: var(--font-ui); font-size: 0.875rem;
+    font-weight: 500; color: var(--text-soft);
+    line-height: 1.3; transition: color 0.15s;
+  }
+  .nav-link:hover .nav-title { color: var(--text-main); }
+  .nav-up {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); white-space: nowrap;
+    transition: color 0.15s; flex-shrink: 0; text-decoration: none;
+  }
+  .nav-up:hover { color: var(--text-soft); }
 </style>
