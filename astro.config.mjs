@@ -11,5 +11,5 @@ export default defineConfig({
     keystatic(),
   ],
   output: 'hybrid',
-  adapter: vercel(),
+  adapter: vercel({ nodeVersion: '20' }),
 })
