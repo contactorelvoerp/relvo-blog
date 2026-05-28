@@ -121,7 +121,7 @@ const headings = extractHeadings(content)
     <!-- Article -->
     <article class="prose-wrap" id="article-body">
       <div class="prose-relvo">
-        <ArticleRenderer document={content} />
+        <ArticleRenderer document={content} headingIds={headings.map(h => h.id)} />
       </div>
     </article>
 
