@@ -135,16 +135,34 @@ function formatDate(d: string) {
 <style>
   /* ── Cover image ── */
   .cover-wrap {
-    width: 100%;
-    max-height: 520px;
+    position: relative;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 280px;
     overflow: hidden;
-    display: block;
+  }
+  @media (min-width: 640px) {
+    .cover-wrap { height: 340px; }
   }
   .cover-img {
     width: 100%;
-    max-height: 520px;
+    height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: 8px 8px 0 0;
+  }
+  /* Fade to white at the bottom */
+  .cover-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent 0%, #ffffff 100%);
+    pointer-events: none;
+    border-radius: 0 0 8px 8px;
   }
 
   /* ── Article header ── */
