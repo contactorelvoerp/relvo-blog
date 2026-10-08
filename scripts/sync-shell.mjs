@@ -39,7 +39,9 @@ header = header
 const cta = pick(/<section class="section section--cta[\s\S]*?<\/section>/, 'el CTA')
   .replace(/<div class="texture[^"]*" aria-hidden="true"><canvas><\/canvas><\/div>/, '')
 const footer = localize(pick(/<footer class="footer[\s\S]*?<\/footer>/, 'el footer'))
-const analytics = pick(/<script>window\.dataLayer[\s\S]*?<\/script>/, 'el script de analytics')
+// Analytics solo está en el HTML de producción: con un preview o un build local se conserva el actual
+const analytics = html.match(/<script>window\.dataLayer[\s\S]*?<\/script>/)?.[0]
+  ?? fs.readFileSync(path.join(root, 'src/shell/analytics.html'), 'utf8').trim()
 
 const out = (p, s) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, s) }
 for (const [name, s] of Object.entries({ header, cta, footer, analytics })) out(path.join(root, `src/shell/${name}.html`), `${s}\n`)
