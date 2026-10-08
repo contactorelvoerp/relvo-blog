@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config'
 import react from '@astrojs/react'
 import keystatic from '@keystatic/astro'
-import vercel from '@astrojs/vercel/serverless'
+import vercel from '@astrojs/vercel'
 
 // El blog se publica en getrelvo.ai/blog: la landing hace rewrite de /blog y /blog/* a este
 // proyecto. Por eso páginas, imágenes, fuentes y assets del build viven bajo /blog. El admin de
@@ -9,7 +9,8 @@ import vercel from '@astrojs/vercel/serverless'
 export default defineConfig({
   site: 'https://getrelvo.ai',
   integrations: [react(), keystatic()],
-  output: 'hybrid',
+  // Estático: las páginas se generan en el build; solo el admin y la API de Keystatic corren en el servidor
+  output: 'static',
   build: { assets: 'blog/_astro' },
-  adapter: vercel({ nodeVersion: '20' }),
+  adapter: vercel(),
 })
