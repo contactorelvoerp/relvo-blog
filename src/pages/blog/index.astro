@@ -1,0 +1,67 @@
+---
+export const prerender = true
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import cta from '../../shell/cta.html?raw'
+import { getPosts, postPath } from '../../lib/posts'
+import { pictureHtml } from '../../lib/images'
+import { categoryLabel } from '../../lib/categories'
+import { BLOG_META, BLOG_PATH, SITE_NAME, absoluteUrl, breadcrumb, formatDate, orgRef, paragraphs } from '../../lib/site'
+
+const posts = await getPosts()
+const [featured, ...rest] = posts
+
+const graph = [
+  {
+    '@type': 'Blog',
+    '@id': absoluteUrl(`${BLOG_PATH}#blog`),
+    name: BLOG_META.title,
+    description: BLOG_META.description,
+    url: absoluteUrl(BLOG_PATH),
+    inLanguage: 'es',
+    publisher: orgRef,
+    blogPost: posts.map((p) => ({ '@type': 'BlogPosting', headline: p.entry.title, url: absoluteUrl(postPath(p.slug)), datePublished: p.entry.publishedAt })),
+  },
+  breadcrumb([[SITE_NAME, '/'], ['Blog', BLOG_PATH]]),
+]
+---
+
+<BaseLayout title={BLOG_META.title} description={BLOG_META.description} path={BLOG_PATH} image="/og/blog-es.png" imageAlt={BLOG_META.title} graph={graph}>
+  <section class="section band band--first blog-head">
+    <h1 class="blog-head__title">Blog</h1>
+    <p class="blog-head__lead">{BLOG_META.description}</p>
+  </section>
+
+  {posts.length > 0 && (
+    <section class="section band blog-list" aria-label="Artículos">
+      {featured && (
+        <a class="post post--featured" href={postPath(featured.slug)}>
+          {featured.entry.coverImage && <Fragment set:html={pictureHtml(featured.entry.coverImage, '', { eager: true, className: 'post__cover' })} />}
+          <div class="post__body">
+            <p class="post__meta">{categoryLabel(featured.entry.category)} · <time datetime={featured.entry.publishedAt}>{formatDate(featured.entry.publishedAt!)}</time></p>
+            <h2 class="post__title">{featured.entry.title}</h2>
+            {paragraphs(featured.entry.excerpt).map((p) => <p class="post__excerpt">{p}</p>)}
+            <p class="post__author">{featured.entry.author}</p>
+          </div>
+        </a>
+      )}
+      {rest.length > 0 && (
+        <ul class="posts">
+          {rest.map((post) => (
+            <li>
+              <a class="post" href={postPath(post.slug)}>
+                {post.entry.coverImage && <Fragment set:html={pictureHtml(post.entry.coverImage, '', { className: 'post__cover' })} />}
+                <div class="post__body">
+                  <p class="post__meta">{categoryLabel(post.entry.category)} · <time datetime={post.entry.publishedAt}>{formatDate(post.entry.publishedAt!)}</time></p>
+                  <h2 class="post__title">{post.entry.title}</h2>
+                  <p class="post__excerpt">{paragraphs(post.entry.excerpt)[0]}</p>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )}
+
+  <Fragment set:html={cta} />
+</BaseLayout>

@@ -1,2 +1,7 @@
 node_modules
 .vercel
+dist
+.astro
+# Generados por scripts/images.mjs
+src/generated
+public/blog/**/*.opt.webp

@@ -1,0 +1,13 @@
+---
+export const prerender = true
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { BLOG_META, BLOG_PATH } from '../lib/site'
+---
+
+<!-- Igual a la 404 de la landing -->
+<BaseLayout title="Página no encontrada" description={BLOG_META.description} path={BLOG_PATH} image="/og/blog-es.png" imageAlt={BLOG_META.title} noindex>
+  <section class="not-found">
+    <h1 class="not-found__title">Página no encontrada</h1>
+    <a class="btn btn--secondary btn--md" href="/">Volver al inicio</a>
+  </section>
+</BaseLayout>

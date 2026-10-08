@@ -10,7 +10,7 @@ export default config({
     brand: {
       name: 'The Pricing Room',
       mark: () => (
-        <img src="/logo-mark-dark.svg" alt="Relvo" height={24} />
+        <img src="/blog/shell/logo-mark-dark.svg" alt="Relvo" height={24} />
       ),
     },
   },
