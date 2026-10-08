@@ -1,3 +1,10 @@
 {
-  "framework": "astro"
+  "framework": "astro",
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/", "has": [{ "type": "host", "value": "blog.relvoerp.com" }], "destination": "https://getrelvo.ai/blog", "statusCode": 301 },
+    { "source": "/blog", "has": [{ "type": "host", "value": "blog.relvoerp.com" }], "destination": "https://getrelvo.ai/blog", "statusCode": 301 },
+    { "source": "/blog/:path*", "has": [{ "type": "host", "value": "blog.relvoerp.com" }], "destination": "https://getrelvo.ai/blog/:path*", "statusCode": 301 },
+    { "source": "/", "destination": "/blog", "permanent": false }
+  ]
 }
