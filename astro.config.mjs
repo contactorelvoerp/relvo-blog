@@ -13,4 +13,7 @@ export default defineConfig({
   output: 'static',
   build: { assets: 'blog/_astro' },
   adapter: vercel(),
+  // El login de Keystatic arma el callback de GitHub con el host de la petición. Sin esto, Astro
+  // ignora el X-Forwarded-Host de Vercel y el callback sale como https://localhost/...
+  security: { allowedDomains: [{ hostname: 'relvo-blog.vercel.app', protocol: 'https' }] },
 })
