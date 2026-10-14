@@ -65,6 +65,7 @@ export default config({
         content: fields.document({
           label: 'Contenido',
           formatting: true,
+          tables: true,
           dividers: true,
           links: true,
           images: {

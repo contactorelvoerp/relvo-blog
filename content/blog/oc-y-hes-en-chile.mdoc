@@ -1,0 +1,185 @@
+---
+title: 'OC y HES en Chile: por qué cada cliente grande te pide algo distinto antes de pagarte'
+publishedAt: 2026-10-14
+category: the-bill
+excerpt: >-
+  En Chile no hay una regla única para facturar a empresas grandes: OC, HES,
+  visto bueno o portal, con la prefactura antes. Por qué pasa, cómo es afuera y
+  qué preguntar.
+coverImage: /blog/oc-y-hes-en-chile/coverImage.jpg
+author: Ricardo Cerda Waak
+featured: false
+---
+No hay una regla única. Antes de aceptar tu factura, cada empresa grande exige su propia prueba de que el gasto estaba autorizado y el servicio se prestó: solo la orden de compra (OC), solo la hoja de entrada de servicio (HES), ambas, un visto bueno por correo o una aprobación en su portal. Eso lo define el control interno del cliente, no el SII.
+
+Para entender por qué cada uno pide algo distinto, conviene partir por el origen de la costumbre.
+
+## ¿De dónde viene pedir OC y HES?
+
+Viene de cómo pagan las empresas grandes. Sus áreas de cuentas por pagar usan un control llamado [*three-way match*](https://www.gep.com/info-guide/three-way-matching-accounts-payable-guide): antes de soltar la plata cruzan tres documentos, la orden de compra, la recepción y la factura, y si no calzan no pagan.
+
+Para las empresas que reportan bajo la ley Sarbanes-Oxley de EE.UU., ese cruce es [uno de los controles que más revisan los auditores](https://erpresearch.com/glossary/three-way-matching). Las multinacionales lo traen a Chile tal cual, y en SAP la recepción de un servicio se llama *service entry sheet*: de ahí viene la HES.
+
+En Chile se suma un motivo propio. El cliente tiene [8 días corridos desde que la factura llega al SII para reclamarla](https://www.sii.cl/preguntas_frecuentes/factura_electronica/001_003_6514.htm); si no lo hace, queda aceptada. Ocho días es poco para perseguir a un jefe de área, así que el cliente prefiere tener todo aprobado antes de que la factura exista.
+
+Que el control venga del mismo lugar no significa que todos lo apliquen igual.
+
+## ¿Siempre necesitas OC y HES?
+
+No. En los clientes de Relvo vemos cinco formas distintas de aprobar un servicio antes de la factura:
+
+{% table %}
+* Lo que pide el cliente
+* Cuándo aparece
+* Ejemplo
+---
+* Solo OC
+* Productos o servicios puntuales con precio cerrado
+* [El Estado](https://www.chilecompra.cl/2019/05/atencion-proveedores-conoce-mas-sobre-tu-rol-en-el-proceso-de-digitalizacion-de-pagos/): OC aceptada y recepción conforme en Mercado Público
+---
+* Solo HES
+* Servicios bajo un contrato marco, sin OC por cada mes
+* [Codelco](https://www.codelco.com/prontus_codelco/site/docs/20110719/20110719104719/decalogo_buenaspracticas_factoring.pdf): la factura de servicios indica una HES de la serie 100XXXXXXX
+---
+* OC + HES
+* Mineras, bancos, forestales, utilities
+* [BCI](https://www.bci.cl/proveedores): contrato u OC antes del servicio y HES después de la recepción
+---
+* Visto bueno
+* Clientes sin ERP de compras: startups, pymes, áreas chicas
+* Un correo del responsable que dice “ok, factura”
+---
+* Portal del cliente
+* Clientes con SAP Ariba, NetSuite u otro portal
+* [BHP](https://www.bhp.com/-/media/documents/suppliers/ariba/210309_qrg-gua-de-inicio-rpido-de-std-y-problemas-comunes.pdf): el proveedor crea la HES en Ariba, BHP la aprueba y recién ahí se factura
+{% /table %}
+
+![Las cinco formas en que una empresa en Chile aprueba un servicio antes de recibir la factura: solo OC, solo HES, OC y HES, visto bueno o aprobación en el portal del cliente, siempre después de la prefactura](/blog/oc-y-hes-en-chile/cinco-formas.png)
+
+Lo que cambia entre una forma y otra es quién aprueba y dónde queda registrado. Lo que no cambia es que, sin esa aprobación, la factura no se paga.
+
+Visto así parece un enredo chileno, pero no lo es. La misma lógica corre en todo el mundo; lo que cambia es cuánto se estandarizó.
+
+## ¿Cómo se hace en el resto del mundo?
+
+En todos lados la factura B2B grande viaja con una referencia a la compra. La diferencia está en dónde va esa referencia y quién decide el formato:
+
+{% table %}
+* País o región
+* Cómo lo hacen
+---
+* Reino Unido y Europa
+* Muchas organizaciones aplican políticas “No PO, No Pay”: la factura sin número de OC se devuelve sin pagar, como hace el [aeropuerto de Bruselas](https://www.brusselsairport.be/en/b2b/suppliers/practical-information/no-po-no-pay-policy). Algunas, como el [condado de Worcestershire](https://www.worcestershire.gov.uk/sites/default/files/2024-12/No%20PO%20No%20Pay%20Policy%20%284%29.docx), cuentan el plazo de pago desde la factura corregida
+---
+* México
+* Las grandes cadenas exigen una *addenda* en el XML con la OC y su código de proveedor. [No es requisito del SAT, sino del comprador](https://yo-facturo.com/blog/addenda-en-el-cfdi-que-es-para-que-sirve/)
+---
+* Brasil
+* La NF-e tiene campos estándar para la OC y su línea (`xPed` y `nItemPed`). [Cargill devuelve las notas que no los traen](https://mgmt.wcm.cargill.com/ms_sc/doc/1432175177916/official-notice-to-suppliers.pdf)
+---
+* Chile
+* La OC tiene código estándar (801). La HES no: cada cliente la pide distinto
+{% /table %}
+
+Esa última fila es el problema chileno. Brasil fijó dónde va la referencia; aquí depende del instructivo de cada empresa, y eso se nota sobre todo con los clientes más grandes.
+
+## ¿Qué piden los clientes más exigentes?
+
+Basta revisar cinco instructivos de proveedores para ver que cada uno trae sus propias reglas:
+
+{% table %}
+* Cliente
+* Lo que piden
+---
+* [BHP](https://www.bhp.com/-/media/documents/suppliers/180827_condicionesdelprocesodefacturacionypago.pdf?la=en)
+* HES aprobada en Ariba y factura con el número de HES y de OC. Cualquier diferencia es rechazo
+---
+* [CBB](https://portalproveedores.cbb.cl/wp-content/uploads/2025/03/PCMA04-RecepcionFacturas-v30092021.pdf)
+* Una sola HES por factura, con el texto “HES” como tipo de referencia
+---
+* [Banco Central](https://www.bcentral.cl/documents/33528/112436/BCCh-Instrucciones-recepcion-DTE.pdf)
+* HES con código de referencia 802 y una sola OC por factura
+---
+* [Metso](https://applications.sa.metso.com/supplierportal/downloads/Manual_de_facturaci%C3%B3n_Metso_-_MIS.pdf)
+* Una sola OC y máximo 30 ítems por factura
+---
+* [Ericsson](https://www.ericsson.com/48f8e3/assets/local/about-ericsson/sourcing/documents/invoicing-and-payments/a-d/chile-es-supplier-handbook-20250124.pdf)
+* Una OC por factura; la aceptación o el rechazo aparece en Ariba entre 5 y 7 días después
+{% /table %}
+
+Con reglas tan distintas, cuesta acertar a la primera. Por eso existe un paso que ayuda en todos los casos, antes de emitir nada: la prefactura.
+
+## ¿Qué es una prefactura y por qué sirve en todos los casos?
+
+La prefactura es un documento sin valor tributario que le muestra al cliente, con todo el detalle, lo que le vas a facturar: períodos, cantidades, tarifas, reajustes, descuentos y el total. El cliente la revisa, la corrige si hace falta y recién con su conformidad emites la factura electrónica.
+
+Funciona con cualquiera de las cinco formas de aprobación. [BHP la pone como primer paso de su proceso para servicios](https://www.bhp.com/-/media/documents/suppliers/180827_condicionesdelprocesodefacturacionypago.pdf?la=en): el proveedor manda la prefactura en PDF o por correo, el responsable del contrato la aprueba o la rechaza, y solo después se pide la HES y se emite la factura.
+
+Se le llama de varias formas, y en la práctica cumplen el mismo rol:
+
+{% table %}
+* Nombre
+* Dónde se usa
+---
+* Prefactura
+* El nombre más común en servicios B2B en Chile
+---
+* Factura proforma
+* Comercio exterior y cotizaciones formales. En Chile, [Aduanas la acepta para iniciar una exportación](https://blog.nubox.com/empresas/factura-proforma-en-chile)
+---
+* Estado de pago
+* Contratos de obras y servicios por avance. [BHP lo usa como sinónimo de prefactura](https://www.bhp.com/-/media/documents/suppliers/180827_condicionesdelprocesodefacturacionypago.pdf?la=en)
+---
+* *Pro forma invoice*
+* Afuera: [un compromiso de precio que se emite antes del despacho o para pedir un anticipo](https://definitions.uslegal.com/p/pro-forma-invoice/)
+{% /table %}
+
+Lo que no es: una factura. [No forma parte de los documentos tributarios electrónicos](https://blog.nubox.com/empresas/factura-proforma-en-chile), no sirve ante el SII y no da derecho a crédito fiscal. Tampoco se contabiliza, y [se puede corregir o anular sin emitir nota de crédito](https://www.billin.net/blog/una-factura-proforma/).
+
+Ahí está su valor. Un error en la prefactura se arregla con un correo; el mismo error en la factura termina en rechazo.
+
+## ¿Por qué rechazan una factura que parecía bien hecha?
+
+Cuando no hubo prefactura, o el detalle cambió entre la prefactura y la factura, aparecen casi siempre los mismos cinco motivos:
+
+1. **La aprobación no estaba lista.** La HES, el visto bueno o la aprobación en el portal seguían pendientes.
+2. **El monto no calza.** El neto tiene que ser igual al aprobado, al peso. Prorrateos y reajustes en UF son los sospechosos de siempre.
+3. **Hay más de una OC o HES en la factura** y el cliente acepta una sola.
+4. **La referencia va en el campo o con el código equivocado** para ese cliente.
+5. **La moneda o la UF no coinciden con la OC.**
+
+Cada rechazo cuesta lo mismo: nota de crédito, factura nueva y un plazo de pago que parte de cero. Casi todos se evitan con una conversación al comienzo de la relación.
+
+## ¿Qué preguntarle a un cliente nuevo antes de la primera factura?
+
+- ¿Necesitas OC? ¿Una por factura o una abierta para todo el contrato?
+- ¿Cómo apruebas el servicio: HES, recepción, visto bueno por correo o aprobación en un portal? ¿Te sirve recibir una prefactura antes?
+- ¿Quién aprueba y cuánto se demora normalmente?
+- ¿Cómo quieres las referencias en el DTE? Pídele el instructivo de proveedores.
+- ¿En qué moneda y con qué UF o tipo de cambio facturo?
+- ¿A qué casilla o portal mando la factura, y hay fecha de corte mensual?
+
+Hacer estas preguntas una vez es fácil. Lo difícil es acordarse de las respuestas de cada cliente, mes a mes.
+
+## ¿Cómo se automatiza?
+
+Ahí se va el tiempo: saber qué aprobación pide cada cliente, mandar el detalle, perseguir el visto bueno y cuadrar el monto antes de emitir.
+
+Para eso existe Relvo. Automatiza el ciclo que va del contrato al cobro para empresas B2B con ingresos recurrentes: toma las condiciones de cobro directo del contrato de cada cliente, gestiona el visto bueno, la OC o la HES que ese cliente pide antes de facturar y, cuando entra el pago, lo concilia con el banco. Las respuestas a esas preguntas se configuran una vez y se aplican todos los meses.
+
+## Preguntas frecuentes
+
+**¿Es obligatorio por ley poner la OC o la HES en la factura?**
+No. El SII no lo exige. Es un requisito del cliente, y si no lo cumples puede reclamar la factura dentro de 8 días.
+
+**¿Qué código lleva la orden de compra en la factura electrónica?**
+El 801, en el campo de referencias del DTE.
+
+**¿Y la HES?**
+No hay un código único. Según el cliente puede ser 802, el texto “HES” u otra convención de su instructivo.
+
+**¿Qué es una prefactura?**
+Un documento sin valor tributario con el detalle de lo que vas a facturar, para que el cliente lo revise antes de la factura electrónica. También se le llama factura proforma o estado de pago. No sirve ante el SII ni da crédito fiscal.
+
+**¿Cómo funciona en otros países?**
+Igual en el fondo: la factura viaja con la referencia a la compra. Brasil la estandarizó en la NF-e, México la pone en una addenda del CFDI y en Europa son comunes las políticas “No PO, No Pay”.
