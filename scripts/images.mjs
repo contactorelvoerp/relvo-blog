@@ -5,6 +5,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import crypto from 'node:crypto'
 import sharp from 'sharp'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -27,7 +28,10 @@ for (const file of files(dir)) {
   if (!fs.existsSync(webp) || fs.statSync(webp).mtimeMs < fs.statSync(file).mtimeMs) {
     await sharp(file).resize({ width, withoutEnlargement: true }).webp({ quality: 82 }).toFile(webp)
   }
-  manifest[url] = { width, height, webp: url.replace(/\.(png|jpe?g)$/i, '.opt.webp') }
+  // Huella del contenido: Keystatic guarda la portada siempre como coverImage.<ext>, así que al
+  // reemplazarla la URL no cambia y navegadores y CDN siguen mostrando la anterior. ?v= lo evita.
+  const v = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex').slice(0, 10)
+  manifest[url] = { width, height, webp: url.replace(/\.(png|jpe?g)$/i, '.opt.webp'), v }
 }
 fs.mkdirSync(path.join(root, 'src/generated'), { recursive: true })
 fs.writeFileSync(path.join(root, 'src/generated/images.json'), `${JSON.stringify(manifest, null, 2)}\n`)

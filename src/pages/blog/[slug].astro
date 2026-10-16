@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 import cta from '../../shell/cta.html?raw'
 import { articleHtml } from '../../components/ArticleRenderer'
 import { getPosts, postPath, readPost } from '../../lib/posts'
-import { imageSize, pictureHtml } from '../../lib/images'
+import { imageSize, pictureHtml, versioned } from '../../lib/images'
 import { categoryLabel } from '../../lib/categories'
 import { BLOG_PATH, SITE_NAME, absoluteUrl, breadcrumb, formatDate, orgRef, paragraphs } from '../../lib/site'
 
@@ -55,13 +55,13 @@ const graph = [
     author: { '@type': 'Person', name: post.author },
     publisher: orgRef,
     isPartOf: { '@id': absoluteUrl(`${BLOG_PATH}#blog`) },
-    ...(cover ? { image: { '@type': 'ImageObject', url: absoluteUrl(cover), ...imageSize(cover) && { width: imageSize(cover)!.width, height: imageSize(cover)!.height } } } : {}),
+    ...(cover ? { image: { '@type': 'ImageObject', url: absoluteUrl(versioned(cover)), ...imageSize(cover) && { width: imageSize(cover)!.width, height: imageSize(cover)!.height } } } : {}),
   },
   breadcrumb([[SITE_NAME, '/'], ['Blog', BLOG_PATH], [post.title, path]]),
 ]
 ---
 
-<BaseLayout title={`${post.title} | Blog de ${SITE_NAME}`} description={description} path={path} image={cover ?? '/og/blog-es.png'} imageAlt={post.title} type="article" graph={graph}>
+<BaseLayout title={`${post.title} | Blog de ${SITE_NAME}`} description={description} path={path} image={cover ? versioned(cover) : '/og/blog-es.png'} imageAlt={post.title} type="article" graph={graph}>
   <article class="article">
     <header class="section band band--first art-head">
       <nav aria-label="Migas de pan">
