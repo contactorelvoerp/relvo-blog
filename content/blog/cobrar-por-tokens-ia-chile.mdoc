@@ -10,7 +10,7 @@ featured: false
 ---
 Para cobrar por tokens o llamadas a la API a tus clientes de IA, mide el consumo de cada llamada con el dato que entrega el modelo, conviértelo en créditos con tu margen y descuéntalo de un saldo prepagado o cóbralo como excedente. En Chile, un paquete de créditos se factura con IVA al cobrarlo, no al consumirlo.
 
-Esa respuesta tiene tres capas que suelen explicarse por separado: la comercial (qué modelo de cobro usar), la técnica (cómo pasa el consumo del modelo a un registro confiable por cliente) y la tributaria (qué documento emites y cuándo). Este artículo las recorre en ese orden, partiendo por el modelo comercial, porque define qué tiene que medir tu sistema.
+El token es fácil de medir y difícil de vender: tu cliente no sabe cuántos necesita ni qué obtiene con ellos, y en Chile además hay que facturarlo bien. Por eso conviene separar tres capas: la comercial (qué modelo de cobro usar y qué unidad vender), la técnica (cómo pasa el consumo del modelo a un registro confiable por cliente) y la tributaria (qué documento emites y cuándo). Este artículo las recorre en ese orden.
 
 ## Cuatro formas de cobrar por tokens
 
@@ -59,7 +59,37 @@ Si defines que 1 crédito vale USD 0,01 y cada consulta descuenta 5 créditos, c
 
 Hay un riesgo más en Latinoamérica: el proveedor te cobra en dólares y tu cliente probablemente te paga en pesos. Si fijas el paquete en pesos, el tipo de cambio mueve tu margen y conviene dejar un colchón; si lo fijas en dólares, el contrato tiene que decir qué tipo de cambio se usa al facturar.
 
-La tabla de conversión vive en tu sistema, no en la factura. Para que funcione, cada llamada tiene que dejar un registro del consumo real.
+Los créditos resuelven la variación del costo. Pero no son el último paso.
+
+## De tokens a créditos, y de créditos a resultados
+
+Scott Woody, CEO de Metronome, separa [tres cosas por las que se puede cobrar](https://stripe.com/blog/where-pricing-is-headed): lo que te cuesta producir (los tokens), lo que tu producto entrega (una conversación de soporte resuelta, un documento procesado, una imagen generada) y el resultado que obtiene el cliente (una venta cerrada, un ahorro). Su tesis es que la factura debería mostrar lo segundo: cobrar por tokens con un recargo deja que tu costo fije tu precio, y cobrar por resultados casi nunca funciona porque es difícil atribuirlos.
+
+{% table %}
+- Unidad de cobro
+- Ejemplo
+- Qué ve el cliente en la factura
+---
+- Tokens
+- USD 0,02 por cada 1.000 tokens
+- Un número que no puede predecir ni controlar
+---
+- Créditos
+- 5 créditos por consulta
+- Un saldo que sube y baja, comparable entre funciones
+---
+- Unidad de trabajo
+- $50 por consulta respondida
+- Lo que efectivamente compró
+---
+- Resultado
+- 10% de cada venta que cierra el agente
+- Un monto discutible, porque el resultado depende de más cosas que tu producto
+{% /table %}
+
+Los créditos son el puente entre los tokens y la unidad de trabajo. En el ejemplo anterior, "1 consulta = 5 créditos" ya es casi un precio por unidad de trabajo: el cliente piensa en consultas y los tokens quedan como un costo interno. En la factura chilena se nota la diferencia, porque la glosa puede decir "2.000 consultas" en vez de "4 millones de tokens de entrada y 1 millón de salida".
+
+Para cobrar por cualquiera de esas unidades, el sistema por debajo es el mismo: cada llamada tiene que dejar un registro de qué se entregó y cuántos tokens costó.
 
 ## ¿Cómo se mide el consumo de cada cliente?
 
