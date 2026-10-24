@@ -259,24 +259,10 @@ Si los créditos vencen y no hay devolución, no corresponde nota de crédito: l
 
 En la contabilidad pasa algo distinto. Bajo NIIF 15, lo que el cliente paga antes de recibir el servicio se registra como un [pasivo del contrato](https://www.ifrs.org/content/dam/ifrs/publications/amendments/spanish/2014/niif-15-ingresos-de-actividades-ordinarias-procedentes-de-contratos-con-clientes.pdf) y pasa a ingreso a medida que el cliente consume. El saldo que probablemente nunca se use tiene su propio tratamiento en la norma, como [derechos no ejercidos de los clientes](https://cdn.www.gob.pe/uploads/document/file/258779/232129_ES_GVT_IFRS15_2015.pdf20181218-16260-i9zkkc.pdf), y la forma de estimarlo conviene definirla con tu contador desde el primer paquete.
 
-Así, un mismo paquete vive en tres calendarios: el tributario, que se cierra al facturar; el contable, que avanza con el consumo; y el del cliente, que mira su saldo. Para mantenerlos alineados, cada movimiento del saldo tiene que quedar registrado.
-
-## El saldo es un libro de movimientos
-
-El error más común es guardar el saldo como un número que se actualiza. Funciona hasta que un cliente pregunta por qué tiene menos créditos de los que esperaba, o hasta que el contador pregunta cuánto venció en el trimestre.
-
-La alternativa es la de cualquier sistema contable: un registro donde solo se agregan movimientos y el saldo se calcula a partir de ellos. Los movimientos típicos son:
-
-- **Otorgamiento:** compra, renovación o regalo, con su fecha de inicio y de vencimiento.
-- **Reserva y liberación:** antes y después de cada llamada.
-- **Consumo:** lo que efectivamente se descontó, ligado al evento de uso que lo originó.
-- **Traspaso:** el saldo que pasa de un período o contrato al siguiente.
-- **Vencimiento y revocación:** lo que se pierde o se anula, con su motivo.
-
-Con ese registro, la pregunta del cliente y la del contador se responden con la misma consulta. Y la conciliación del mes deja de depender de una planilla.
+Así, un mismo paquete vive en tres calendarios: el tributario, que se cierra al facturar; el contable, que avanza con el consumo; y el del cliente, que mira su saldo. Mantenerlos alineados es trabajo de todos los cierres de mes.
 
 ## Dónde se va el tiempo
 
-El trabajo pesado está en conectar el evento de uso con el saldo, el saldo con la factura y la factura con el pago.
+El trabajo pesado está en conectar el evento de uso con el saldo, el saldo con la factura y la factura con el pago, y en que los tres calendarios cuadren cada mes.
 
-Para eso existe Relvo, una plataforma con sede en Santiago que automatiza el ciclo que va del contrato al cobro para empresas B2B. Recibe los eventos de uso por API, en lotes de hasta 500 con llave de idempotencia por evento y correcciones que anulan o reemplazan sin editar, y calcula sobre ellos las métricas que cobras. Los créditos pueden ser en plata o en unidades de una métrica, comprados o de regalo, sueltos o parte del contrato, con renovación, traspaso de saldo y vencimiento configurables, y cada movimiento queda en un registro con reservas, consumos, traspasos y vencimientos. La compra del paquete puede generar su propia factura, el excedente se factura en su período y, cuando entra el pago, Relvo lo concilia con el banco. El corte en tiempo real queda en tu gateway; todo lo que pasa después del consumo, en Relvo.
+Para eso existe Relvo, una plataforma con sede en Santiago que automatiza el ciclo que va del contrato al cobro para empresas B2B. Recibe el consumo de tu producto, lo descuenta de los créditos de cada cliente, emite la factura que corresponde en cada caso y concilia el pago con el banco. El corte en tiempo real queda en tu gateway; todo lo que pasa después del consumo, en Relvo.
