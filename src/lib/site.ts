@@ -17,8 +17,16 @@ export const PRODUCTION = process.env.VERCEL_ENV === 'production'
 export const absoluteUrl = (path: string) => `${SITE_URL}${path}`
 
 const ORG_ID = `${SITE_URL}/#organization`
+// Igual que en relvo-landing (src/seo/head.js): description = meta de la home; la desambiguación evita
+// que los motores lean a Relvo como software de cuentas por pagar. Solo datos estructurados.
+const ORG_DESCRIPTION = 'Relvo convierte tu pricing en ingresos: calcula, factura, cobra y concilia planes fijos, seats y uso en un solo sistema. Para SaaS e IA en LatAm.'
+const ORG_DISAMBIGUATION = 'Software de cuentas por cobrar para empresas B2B que venden y facturan, no de cuentas por pagar: automatiza contratos, medición de uso, facturación electrónica, cobranza y conciliación bancaria para SaaS e IA en LatAm.'
 export const baseGraph = () => [
-  { '@type': 'Organization', '@id': ORG_ID, name: SITE_NAME, url: `${SITE_URL}/`, logo: `${SITE_URL}/logo-logotype-dark.svg`, sameAs: [LINKEDIN_URL] },
+  {
+    '@type': 'Organization', '@id': ORG_ID, name: SITE_NAME, url: `${SITE_URL}/`, logo: `${SITE_URL}/logo-logotype-dark.svg`,
+    description: ORG_DESCRIPTION, disambiguatingDescription: ORG_DISAMBIGUATION,
+    sameAs: [LINKEDIN_URL],
+  },
   { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: SITE_NAME, url: `${SITE_URL}/`, inLanguage: 'es', publisher: { '@id': ORG_ID } },
 ]
 export const orgRef = { '@id': ORG_ID }
