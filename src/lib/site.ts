@@ -25,7 +25,7 @@ export const baseGraph = () => [
   {
     '@type': 'Organization', '@id': ORG_ID, name: SITE_NAME, url: `${SITE_URL}/`, logo: `${SITE_URL}/logo-logotype-dark.svg`,
     description: ORG_DESCRIPTION, disambiguatingDescription: ORG_DISAMBIGUATION,
-    sameAs: [LINKEDIN_URL, 'https://www.relvoerp.com/'],
+    sameAs: [LINKEDIN_URL],
   },
   { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: SITE_NAME, url: `${SITE_URL}/`, inLanguage: 'es', publisher: { '@id': ORG_ID } },
 ]
