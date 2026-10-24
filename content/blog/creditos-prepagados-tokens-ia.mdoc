@@ -1,0 +1,158 @@
+---
+title: Cómo cobrar con créditos prepagados por tokens de IA en Chile
+publishedAt: 2026-10-27
+category: ai-revenue
+excerpt: >-
+  Cómo convertir tokens en créditos, armar el paquete y poner límites, y qué
+  dice la ley chilena sobre cuándo se factura y qué pasa con el saldo que vence.
+author: Team Relvo
+featured: false
+---
+Para cobrar por tokens o llamadas a la API, la forma más usada es vender créditos por adelantado: el cliente compra un paquete, cada uso descuenta créditos según los tokens que consume y, cuando el saldo se acaba, recarga o paga el excedente. Tú cobras antes de pagarle al proveedor del modelo, y el cliente sabe cuánto va a gastar.
+
+Lo que casi nunca se explica es la otra mitad: qué unidad vender, qué hacer con el saldo que no se usa y cómo se factura en Chile un paquete que se consume en varios meses. En Chile, el IVA de un paquete de créditos se paga cuando lo cobras o lo facturas, no a medida que el cliente lo consume, y esa diferencia ordena casi todo lo demás.
+
+Antes de llegar ahí, conviene ver por qué el prepago le gana a las otras dos formas de cobrar por uso.
+
+## Tres formas de cobrar por tokens
+
+{% table %}
+- Modelo
+- Cómo funciona
+- Cuándo conviene
+- Riesgo principal
+---
+- Créditos prepagados
+- El cliente compra un saldo y el consumo lo descuenta
+- Productos self-service, clientes nuevos, uso difícil de predecir
+- Que el cliente se quede sin saldo en medio de un proceso
+---
+- Híbrido
+- Cuota fija con un cupo de tokens incluido, más excedente o recarga
+- Clientes con uso estable que quieren una cuota predecible
+- Calibrar mal el cupo y regalar margen
+---
+- Pospago
+- Se mide todo el mes y se factura al cierre, como hace la nube
+- Clientes grandes con contrato y crédito aprobado
+- Un error en el código del cliente genera una factura que nadie quiere pagar
+{% /table %}
+
+El pospago parece el más simple, pero con IA tiene un problema: tu costo es inmediato y variable. Si un cliente deja un agente corriendo un fin de semana, tú le pagas al proveedor del modelo ese mismo mes y a él le cobras 30 o 60 días después, si es que paga. El prepago invierte ese orden.
+
+Elegir el modelo es la parte fácil. Lo que define si el cliente entiende lo que compra es la unidad que le vendes.
+
+## ¿Por qué vender créditos y no tokens?
+
+Porque el token es una unidad técnica que tu cliente no controla. Una misma consulta gasta más o menos tokens según el largo de la pregunta, el modelo y la respuesta, y el token de salida casi siempre cuesta más que el de entrada. Si vendes tokens, le traspasas al cliente toda esa variación. Si vendes créditos, la absorbes tú en una tabla de conversión.
+
+Un ejemplo con números hipotéticos. Tu producto responde consultas que gastan en promedio 2.000 tokens de entrada y 500 de salida. Si el modelo te cobra USD 3 por millón de tokens de entrada y USD 15 por millón de salida, cada consulta te cuesta:
+
+- Entrada: 2.000 × USD 3 / 1.000.000 = USD 0,006
+- Salida: 500 × USD 15 / 1.000.000 = USD 0,0075
+- Total: USD 0,0135 por consulta
+
+Si defines que 1 crédito vale USD 0,01 y cada consulta descuenta 5 créditos, cobras USD 0,05 por consulta. Un paquete de 10.000 créditos a USD 100 alcanza para 2.000 consultas que te cuestan USD 27: un margen bruto de 73%.
+
+La tabla de conversión es tuya. Si el proveedor baja precios o cambias de modelo, ajustas cuántos créditos descuenta cada acción sin tocar el precio del paquete.
+
+Con la unidad definida, queda armar el paquete. Ahí aparecen decisiones que después cuestan caro de cambiar.
+
+## Seis decisiones al diseñar el paquete
+
+{% table %}
+- Decisión
+- Opciones
+- Qué considerar
+---
+- Unidad del crédito
+- Monto en pesos o dólares, o unidades de una métrica (tokens, consultas)
+- Un crédito en plata sirve para cualquier producto; uno en unidades es más fácil de entender para una sola función
+---
+- Precio vs. valor
+- Vender a valor nominal o con bono (pagas 100, recibes 110)
+- El bono incentiva paquetes grandes, pero baja el margen por unidad
+---
+- Renovación
+- Compra única o cupo que se renueva cada mes, trimestre o año
+- Puedes cobrar una vez al año y renovar el cupo mes a mes
+---
+- Saldo no usado
+- Se pierde, pasa al período siguiente o pasa también al siguiente contrato
+- Traspasar saldo fideliza, pero acumula una deuda en créditos que algún día se consume
+---
+- Vencimiento
+- Sin vencimiento o con fecha de expiración
+- Si vencen, avísalo al vender: es la primera causa de reclamos
+---
+- Alcance
+- Todo el producto o solo ciertas funciones o precios
+- Útil para separar créditos de un modelo caro de los de uno barato
+{% /table %}
+
+Además de los créditos comprados, conviene tener los de regalo separados: los que entregas al registrarse o como compensación. Se consumen igual, pero no tienen precio y no deberían mezclarse con lo que el cliente pagó.
+
+Ninguna de estas decisiones evita, por sí sola, que un cliente gaste más de lo que quería. Para eso hacen falta límites, y no todos viven en el mismo lugar.
+
+## Límites: quién corta y quién cobra
+
+Las facturas sorpresa se evitan con dos tipos de control que conviene no confundir.
+
+El primero corta el consumo en tiempo real. Lo hace el gateway o el backend que llama al modelo: herramientas como [LiteLLM permiten fijar un presupuesto máximo por cliente y rechazan las llamadas cuando se supera](https://docs.litellm.ai/docs/proxy/users). Ahí también van las alertas de saldo bajo y la recarga automática.
+
+El segundo es comercial y actúa en la factura: mínimos que el cliente se compromete a consumir, topes por sobre los cuales no se le cobra más y unidades incluidas sin costo. Ese control vive en el contrato y en el sistema de facturación, y es el que define qué número termina en el documento tributario.
+
+Y ese documento, en Chile, tiene reglas propias sobre cuándo se emite.
+
+## ¿Cuándo se factura un paquete de créditos en Chile?
+
+Cuando lo cobras, no cuando se consume. Desde 2023 [todas las prestaciones de servicios están afectas a IVA](https://www.sii.cl/noticias/2022/211222noti01aav.htm), salvo excepciones puntuales, y en servicios la ley fija el momento de la factura según el pago: [las facturas deben emitirse en el mismo período tributario en que se percibe la remuneración](https://www.sii.cl/pagina/jurisprudencia/adminis/2016/ventas/ja2147.htm). El mismo oficio aclara que, si emites la factura antes de recibir el pago, que es lo normal en B2B, el IVA se devenga con esa emisión.
+
+En la práctica:
+
+{% table %}
+- Qué pasa
+- Qué documento se emite
+---
+- El cliente compra un paquete de créditos
+- Factura afecta por el total del paquete, en el mes en que lo facturas o lo cobras
+---
+- El cliente consume créditos
+- Ninguno: ya está facturado. Solo se descuenta el saldo
+---
+- El cliente consume más de lo que tenía (excedente)
+- Factura por el excedente, en el período que corresponda
+---
+- Plan híbrido con cupo incluido
+- Factura de la cuota en cada período, más el excedente si lo hubo
+{% /table %}
+
+Un paquete de $1.000.000 neto vendido en marzo lleva $190.000 de IVA en la factura de marzo, aunque el cliente lo consuma hasta septiembre. Ese desfase entre lo facturado y lo consumido es el que más confunde, y se nota sobre todo cuando parte del saldo nunca se usa.
+
+## ¿Y si el cliente no usa todos sus créditos?
+
+Depende de si le devuelves plata.
+
+Si los créditos vencen y no hay devolución, no corresponde nota de crédito: la factura ya se emitió por un servicio pagado y el IVA declarado se mantiene. Si en cambio le devuelves el saldo, emites una nota de crédito, pero esa nota [solo tiene valor tributario si la plata se restituye de verdad](https://www.sii.cl/pagina/jurisprudencia/adminis/2005/ventas/ja895.htm). Una nota de crédito sin devolución efectiva no rebaja el débito fiscal.
+
+En la contabilidad pasa algo distinto. Bajo NIIF 15, lo que el cliente paga antes de recibir el servicio se registra como un [pasivo del contrato](https://www.ifrs.org/content/dam/ifrs/publications/amendments/spanish/2014/niif-15-ingresos-de-actividades-ordinarias-procedentes-de-contratos-con-clientes.pdf), y pasa a ingreso a medida que el cliente consume. El saldo que probablemente nunca se use tiene su propio tratamiento en la norma, como [derechos no ejercidos de los clientes](https://cdn.www.gob.pe/uploads/document/file/258779/232129_ES_GVT_IFRS15_2015.pdf20181218-16260-i9zkkc.pdf), y la forma de estimarlo conviene definirla con tu contador desde el primer paquete.
+
+El resultado es que un mismo paquete vive en tres calendarios: el tributario, que se cierra al facturar; el contable, que avanza con el consumo; y el del cliente, que mira su saldo. Mantenerlos alineados es la parte operativa del modelo.
+
+## Lo que tiene que cuadrar cada mes
+
+Al cierre de cada mes, para cada cliente, deberías poder responder sin abrir una planilla:
+
+- ¿Cuánto saldo compró, cuánto consumió, cuánto venció y cuánto le queda?
+- ¿Qué créditos estaban pagados y cuáles eran de regalo?
+- ¿Cada paquete vendido tiene su factura, y cada excedente la suya?
+- ¿Cuánto del saldo vigente es ingreso que todavía no se reconoce?
+- ¿Los pagos que entraron al banco calzan con las facturas de compra de créditos?
+
+Con diez clientes se resuelve a mano. Con cien, cada recarga, vencimiento y excedente es un movimiento que alguien tiene que registrar, facturar y conciliar.
+
+## Dónde se va el tiempo
+
+El trabajo pesado está en conectar el consumo con el saldo, el saldo con la factura y la factura con el pago.
+
+Para eso existe Relvo. Automatiza el ciclo que va del contrato al cobro para empresas B2B: recibe el consumo medido de tu producto, lo descuenta de los créditos de cada cliente y factura lo que corresponde. Los créditos pueden ser en plata o en unidades de una métrica, comprados o de regalo, sueltos o parte del contrato, con renovación, traspaso de saldo y vencimiento configurables. La compra del paquete puede generar su propia factura, cada movimiento del saldo queda registrado y, cuando entra el pago, Relvo lo concilia con el banco. El corte en tiempo real queda en tu gateway; todo lo que pasa después del consumo, en Relvo.
