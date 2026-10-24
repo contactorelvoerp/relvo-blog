@@ -1,0 +1,207 @@
+---
+title: Cómo cobrar por tokens y llamadas a la API de IA en Chile
+publishedAt: 2026-10-27
+category: ai-revenue
+excerpt: >-
+  Del token que reporta el modelo a la factura en el SII: modelos de cobro,
+  créditos, eventos de uso, límites y qué dice la ley chilena.
+author: Team Relvo
+featured: false
+---
+Cobrar por tokens o llamadas a la API tiene tres partes que suelen explicarse por separado. La comercial: si vendes créditos por adelantado, una cuota con cupo incluido o consumo a fin de mes. La técnica: cómo pasa el consumo que reporta el modelo a un registro confiable por cliente. Y la tributaria: qué documento emites, cuándo y qué pasa con el saldo que no se usa.
+
+La forma más usada es la de créditos prepagados: el cliente compra un saldo, cada llamada lo descuenta según los tokens consumidos y, cuando se acaba, recarga o paga el excedente. Funciona bien en el producto, pero en Chile tiene una regla que ordena todo lo demás: el IVA de un paquete de créditos se paga cuando lo facturas o lo cobras, no a medida que el cliente lo consume.
+
+Para llegar a esa regla, conviene partir por el modelo comercial, porque define qué tiene que medir tu sistema.
+
+## Tres formas de cobrar por tokens
+
+{% table %}
+- Modelo
+- Cómo funciona
+- Cuándo conviene
+- Riesgo principal
+---
+- Créditos prepagados
+- El cliente compra un saldo y el consumo lo descuenta
+- Productos self-service, clientes nuevos, uso difícil de predecir
+- Que el cliente se quede sin saldo en medio de un proceso
+---
+- Híbrido
+- Cuota fija con un cupo de tokens incluido, más excedente o recarga
+- Clientes con uso estable que quieren una cuota predecible
+- Calibrar mal el cupo y regalar margen
+---
+- Pospago
+- Se mide todo el mes y se factura al cierre, como hace la nube
+- Clientes grandes con contrato y crédito aprobado
+- Un error en el código del cliente genera una factura que nadie quiere pagar
+{% /table %}
+
+El pospago parece el más simple, pero con IA tiene un problema: tu costo es inmediato y variable. Si un cliente deja un agente corriendo un fin de semana, tú le pagas al proveedor del modelo ese mismo mes y a él le cobras 30 o 60 días después, si es que paga. El prepago invierte ese orden.
+
+Elegido el modelo, queda la pregunta de qué unidad le vendes al cliente.
+
+## ¿Por qué vender créditos y no tokens?
+
+Porque el token es una unidad técnica que tu cliente no controla. Una misma consulta gasta más o menos tokens según el largo de la pregunta, el modelo y la respuesta, y el token de salida casi siempre cuesta más que el de entrada. Si vendes tokens, le traspasas toda esa variación. Si vendes créditos, la absorbes tú en una tabla de conversión.
+
+Un ejemplo con números hipotéticos. Tu producto responde consultas que gastan en promedio 2.000 tokens de entrada y 500 de salida. Si el modelo te cobra USD 3 por millón de tokens de entrada y USD 15 por millón de salida, cada consulta te cuesta:
+
+- Entrada: 2.000 × USD 3 / 1.000.000 = USD 0,006
+- Salida: 500 × USD 15 / 1.000.000 = USD 0,0075
+- Total: USD 0,0135 por consulta
+
+Si defines que 1 crédito vale USD 0,01 y cada consulta descuenta 5 créditos, cobras USD 0,05 por consulta. Un paquete de 10.000 créditos a USD 100 alcanza para 2.000 consultas que te cuestan USD 27: un margen bruto de 73%. Si el proveedor baja precios o cambias de modelo, ajustas cuántos créditos descuenta cada acción sin tocar el precio del paquete.
+
+La tabla de conversión vive en tu sistema, no en la factura. Para que funcione, cada llamada tiene que dejar un registro del consumo real, y ese registro empieza en la respuesta del modelo.
+
+## Del token al evento de uso
+
+Los proveedores informan el consumo en cada respuesta. El dato está ahí; lo que hay que cuidar es leerlo en el momento correcto.
+
+{% table %}
+- Proveedor
+- Dónde viene el consumo
+- Ojo con
+---
+- OpenAI (Chat Completions)
+- Campo `usage` de la respuesta, con tokens de entrada y de salida
+- En streaming no viene por defecto: hay que pedir `stream_options: {"include_usage": true}` y [el uso llega en un chunk final extra](https://nbviewer.org/format/script/github/openai/openai-cookbook/blob/main/examples/How_to_stream_completions.ipynb), con `usage` en null en los anteriores
+---
+- Anthropic (Messages)
+- `usage` con `input_tokens` y `output_tokens`
+- En streaming, `message_start` trae la entrada y [los conteos de `message_delta` son acumulados](https://platform.claude.com/docs/en/api/messages-streaming): hay que reemplazar el valor anterior, no sumarlo
+{% /table %}
+
+Con el consumo leído, tu backend emite un evento de uso por cada llamada: quién consumió, qué, cuánto y cuándo. Un evento típico se ve así:
+
+```json
+{
+  "idempotency_key": "req_01HZX8Q4N2",
+  "external_customer_id": "acme",
+  "event_name": "llm_call",
+  "timestamp": "2026-10-27T14:03:07Z",
+  "properties": {
+    "model": "modelo-grande",
+    "input_tokens": 2000,
+    "output_tokens": 500
+  }
+}
+```
+
+A partir de esos eventos se definen las métricas que se cobran: la suma de `input_tokens` del mes por cliente, el conteo de llamadas, o la suma filtrada por modelo si cobras distinto cada uno. Guardar el evento crudo, y no solo el total, es lo que permite cambiar de pricing después sin perder historia.
+
+El flujo se ve simple en un diagrama. En producción aparecen siempre los mismos cuatro problemas.
+
+## Cuatro problemas que aparecen en producción
+
+**1. Eventos duplicados.** Un timeout hace que tu backend reintente el envío, y la misma llamada se cobra dos veces. La solución es una llave de idempotencia por evento, idealmente el id de la request: si llega dos veces con el mismo contenido, se cuenta una. Si llega la misma llave con contenido distinto, es un error que conviene rechazar, porque significa que algo en tu sistema generó dos versiones de la misma llamada.
+
+**2. Eventos tardíos y correcciones.** Una cola que se atrasa, un worker que se cae o un consumo mal atribuido a otro cliente. El `timestamp` tiene que ser el momento en que ocurrió el consumo, en UTC, no el momento del envío, para que caiga en el período correcto. Y cuando hay que corregir un evento, se anula o se reemplaza, nunca se edita. Si el período ya se facturó, la factura emitida no se toca: la diferencia se ajusta con nota de crédito o de débito.
+
+**3. Decimales.** Tokens multiplicados por un precio por millón dan fracciones de centavo. Con números de punto flotante, esas fracciones se redondean distinto en cada paso y la factura no cuadra con el detalle. Cantidades y montos se guardan como decimales exactos, y se redondea una sola vez, al final.
+
+**4. Saldo en tiempo real.** Con créditos prepagados necesitas saber si al cliente le alcanza antes de llamar al modelo, pero el consumo real se conoce después. El patrón es el de una tarjeta de crédito: antes de la llamada se reserva un estimado, al terminar se descuenta el consumo real y se libera la diferencia. Sin reserva, diez llamadas en paralelo pueden gastar el mismo saldo diez veces.
+
+Ese último problema ya es un límite de gasto, y ahí conviene separar dos cosas que se suelen mezclar.
+
+## Límites: quién corta y quién cobra
+
+El primer tipo de límite corta el consumo en tiempo real. Lo hace el gateway o el backend que llama al modelo: herramientas como [LiteLLM permiten fijar un presupuesto máximo por cliente y rechazan las llamadas cuando se supera](https://docs.litellm.ai/docs/proxy/users). Ahí también van las alertas de saldo bajo y la recarga automática.
+
+El segundo es comercial y actúa en la factura: mínimos que el cliente se compromete a consumir, topes por sobre los cuales no se le cobra más y unidades incluidas sin costo. Ese control vive en el contrato y en el sistema de facturación, y define qué número termina en el documento tributario.
+
+Entre los dos queda el diseño del paquete que vendes, con decisiones que después cuestan caro de cambiar.
+
+## Seis decisiones al diseñar el paquete de créditos
+
+{% table %}
+- Decisión
+- Opciones
+- Qué considerar
+---
+- Unidad del crédito
+- Monto en pesos o dólares, o unidades de una métrica (tokens, consultas)
+- Un crédito en plata sirve para cualquier producto; uno en unidades es más fácil de entender para una sola función
+---
+- Precio vs. valor
+- Vender a valor nominal o con bono (pagas 100, recibes 110)
+- El bono incentiva paquetes grandes, pero baja el margen por unidad
+---
+- Renovación
+- Compra única o cupo que se renueva cada mes, trimestre o año
+- Puedes cobrar una vez al año y renovar el cupo mes a mes
+---
+- Saldo no usado
+- Se pierde, pasa al período siguiente o pasa también al siguiente contrato
+- Traspasar saldo fideliza, pero acumula créditos que algún día se consumen
+---
+- Vencimiento
+- Sin vencimiento o con fecha de expiración
+- Si vencen, avísalo al vender: es la primera causa de reclamos
+---
+- Alcance
+- Todo el producto o solo ciertas funciones o precios
+- Útil para separar créditos de un modelo caro de los de uno barato
+{% /table %}
+
+Los créditos de regalo, los que entregas al registrarse o como compensación, conviene llevarlos separados de los comprados: se consumen igual, pero no tienen precio y no deberían mezclarse con lo que el cliente pagó.
+
+Esa diferencia entre lo pagado y lo consumido es justo la que importa cuando llega el momento de facturar.
+
+## ¿Cuándo se factura un paquete de créditos en Chile?
+
+Cuando lo cobras, no cuando se consume. Desde 2023 [todas las prestaciones de servicios están afectas a IVA](https://www.sii.cl/noticias/2022/211222noti01aav.htm), salvo excepciones puntuales, y en servicios la ley fija el momento de la factura según el pago: [las facturas deben emitirse en el mismo período tributario en que se percibe la remuneración](https://www.sii.cl/pagina/jurisprudencia/adminis/2016/ventas/ja2147.htm). El mismo oficio aclara que, si emites la factura antes de recibir el pago, que es lo normal en B2B, el IVA se devenga con esa emisión.
+
+{% table %}
+- Qué pasa
+- Qué documento se emite
+---
+- El cliente compra un paquete de créditos
+- Factura afecta por el total del paquete, en el mes en que lo facturas o lo cobras
+---
+- El cliente consume créditos
+- Ninguno: ya está facturado. Solo se descuenta el saldo
+---
+- El cliente consume más de lo que tenía (excedente)
+- Factura por el excedente, en el período que corresponda
+---
+- Plan híbrido con cupo incluido
+- Factura de la cuota en cada período, más el excedente si lo hubo
+---
+- Se corrige un evento de un período ya facturado
+- Nota de crédito o de débito por la diferencia
+{% /table %}
+
+Un paquete de $1.000.000 neto vendido en marzo lleva $190.000 de IVA en la factura de marzo, aunque el cliente lo consuma hasta septiembre. Ese desfase entre lo facturado y lo consumido se nota sobre todo cuando parte del saldo nunca se usa.
+
+## ¿Y si el cliente no usa todos sus créditos?
+
+Depende de si le devuelves plata.
+
+Si los créditos vencen y no hay devolución, no corresponde nota de crédito: la factura ya se emitió por un servicio pagado y el IVA declarado se mantiene. Si en cambio le devuelves el saldo, emites una nota de crédito, pero esa nota [solo tiene valor tributario si la plata se restituye de verdad](https://www.sii.cl/pagina/jurisprudencia/adminis/2005/ventas/ja895.htm).
+
+En la contabilidad pasa algo distinto. Bajo NIIF 15, lo que el cliente paga antes de recibir el servicio se registra como un [pasivo del contrato](https://www.ifrs.org/content/dam/ifrs/publications/amendments/spanish/2014/niif-15-ingresos-de-actividades-ordinarias-procedentes-de-contratos-con-clientes.pdf) y pasa a ingreso a medida que el cliente consume. El saldo que probablemente nunca se use tiene su propio tratamiento en la norma, como [derechos no ejercidos de los clientes](https://cdn.www.gob.pe/uploads/document/file/258779/232129_ES_GVT_IFRS15_2015.pdf20181218-16260-i9zkkc.pdf), y la forma de estimarlo conviene definirla con tu contador desde el primer paquete.
+
+Así, un mismo paquete vive en tres calendarios: el tributario, que se cierra al facturar; el contable, que avanza con el consumo; y el del cliente, que mira su saldo. Para mantenerlos alineados, cada movimiento del saldo tiene que quedar registrado.
+
+## El saldo es un libro de movimientos
+
+El error más común es guardar el saldo como un número que se actualiza. Funciona hasta que un cliente pregunta por qué tiene menos créditos de los que esperaba, o hasta que el contador pregunta cuánto venció en el trimestre.
+
+La alternativa es la de cualquier sistema contable: un registro donde solo se agregan movimientos y el saldo se calcula a partir de ellos. Los movimientos típicos son:
+
+- **Otorgamiento:** compra, renovación o regalo, con su fecha de inicio y de vencimiento.
+- **Reserva y liberación:** antes y después de cada llamada.
+- **Consumo:** lo que efectivamente se descontó, ligado al evento de uso que lo originó.
+- **Traspaso:** el saldo que pasa de un período o contrato al siguiente.
+- **Vencimiento y revocación:** lo que se pierde o se anula, con su motivo.
+
+Con ese registro, la pregunta del cliente y la del contador se responden con la misma consulta. Y la conciliación del mes deja de depender de una planilla.
+
+## Dónde se va el tiempo
+
+El trabajo pesado está en conectar el evento de uso con el saldo, el saldo con la factura y la factura con el pago.
+
+Para eso existe Relvo. Automatiza el ciclo que va del contrato al cobro para empresas B2B. Recibe los eventos de uso por API, en lotes de hasta 500 con llave de idempotencia por evento y correcciones que anulan o reemplazan sin editar, y calcula sobre ellos las métricas que cobras. Los créditos pueden ser en plata o en unidades de una métrica, comprados o de regalo, sueltos o parte del contrato, con renovación, traspaso de saldo y vencimiento configurables, y cada movimiento queda en un registro con reservas, consumos, traspasos y vencimientos. La compra del paquete puede generar su propia factura, el excedente se factura en su período y, cuando entra el pago, Relvo lo concilia con el banco. El corte en tiempo real queda en tu gateway; todo lo que pasa después del consumo, en Relvo.
