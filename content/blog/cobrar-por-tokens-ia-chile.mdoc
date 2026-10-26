@@ -1,10 +1,11 @@
 ---
 title: 'Cobrar por tokens de IA: del evento de uso a la factura en Chile'
-publishedAt: 2026-10-27
+publishedAt: 2026-10-25
 category: ai-revenue
 excerpt: >-
   Cómo cobrar por tokens o llamadas a la API: modelos de cobro, créditos
   prepagados, medición de consumo, límites y cómo se factura en Chile.
+coverImage: /blog/cobrar-por-tokens-ia-chile/coverImage.png
 author: Team Relvo
 featured: false
 ---
@@ -127,7 +128,7 @@ Con el consumo leído, tu backend emite un evento de uso por cada llamada: quié
 
 A partir de esos eventos se definen las métricas que se cobran: la suma de tokens de entrada del mes por cliente, el conteo de llamadas, o la suma filtrada por modelo si cobras distinto cada uno. Guardar el evento crudo, y no solo el total, es lo que permite cambiar de pricing después sin perder historia, y calcular el margen por cliente comparando lo que le cobraste con lo que te costaron sus tokens.
 
-![Flujo para cobrar por tokens de IA en seis pasos: llamada al modelo, evento de uso, métrica por cliente, saldo de créditos, factura en el SII y pago conciliado, con el problema típico de cada paso](/blog/cobrar-por-tokens-ia-chile/flujo-token-a-factura.png)
+![Del token a la factura, dónde aparece cada problema al cobrar por tokens de IA: llamada al modelo, evento de uso, métrica por cliente, saldo de créditos, factura en el SII y pago conciliado](/blog/cobrar-por-tokens-ia-chile/flujo-token-a-factura.png)
 
 El flujo se ve simple en un diagrama. En producción aparecen siempre los mismos cuatro problemas.
 
